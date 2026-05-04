@@ -8,6 +8,7 @@ gray()   { echo -e "\033[90m$*\033[0m"; }
 
 # XCODE
 ################
+# TODO: xcode-select is interactive install - set it to be non-interactive
 if xcode-select -p &>/dev/null; then
 	gray "-> xcode already installed, skipping"
 else
@@ -31,12 +32,13 @@ else
 	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
 fi
 
+# TODO: Ensure this this line is appended only once 
 if ! grep -q "brew shellenv" ~/zprofile; then
 	echo >> ~/.zprofile
-	echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+	echo 'eval "$(/opt/homebrew/bin/brew shellenv zsh)"' >> ~/.zprofile
 fi
 
-eval "$(/opt/homebrew/bin/brew shellenv)"	
+eval "$(/opt/homebrew/bin/brew shellenv zsh)"	
 green "[x] brew install successful; brew PATH set in .zprofile"
 ################
 
@@ -56,11 +58,12 @@ else
 	curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh -s -- --unattended
 fi
 
+# TODO: This line is not working as expected
 sed -i '' '/ZSH_THEME/c\ZSH_THEME="xiong-chiamiov-plus"' ~/.zshrc
 green "[x] OMZ install successful"
 ################
 
-# Hostname&Computername
+# Hostname change
 ################
 echo -n "Set new hostname and computer name? [y/n]:"
 read -r ans
@@ -68,12 +71,10 @@ read -r ans
 if [[ "$ans" =~ ^[Yy]$ ]]; then
 	echo -n "Enter new hostname:"
 	read -r hostname
-
-	echo -n "Enter new computer name:"
-	read -r computername
+	
 	sudo scutil --set HostName "$hostname"
 	sudo scutil --set LocalHostName "$hostname"
-	sudo scutil --set ComputerName "$computername"
+	sudo scutil --set ComputerName "$hostname"
 else
 	gray "-> Skipping hostname setup"
 fi
